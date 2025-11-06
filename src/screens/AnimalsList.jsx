@@ -1,4 +1,4 @@
-// src/screens/AnimalsList.jsx
+import styles from "../styles/AnimalListStyle";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -97,33 +97,36 @@ export default function AnimalsList({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Button
-        title="Crear nuevo animal"
-        onPress={() => navigation.navigate("CreateAnimal")}
-      />
-      <FlatList
-        data={animals}
-        keyExtractor={(item) => item._id || item.id || item.nombre}
-        renderItem={({ item }) => (
-          <AnimalCard
-            animal={item}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
+      <View style={styles.card}>
+        <Text style={styles.header}>Lista de animales</Text>
+        <View style={styles.buttonContainer}>
+          <Button
+            title="Crear nuevo animal"
+            onPress={() => navigation.navigate("CreateAnimal")}
+            color="#4CAF50"
           />
-        )}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => fetchAnimals(token)}
-          />
-        }
-        ListEmptyComponent={<Text style={styles.empty}>No hay animales</Text>}
-      />
+        </View>
+
+        <FlatList
+          data={animals}
+          keyExtractor={(item) => item._id || item.id || item.nombre}
+          renderItem={({ item }) => (
+            <AnimalCard
+              animal={item}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          )}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => fetchAnimals(token)}
+            />
+          }
+          ListEmptyComponent={<Text style={styles.empty}>No hay animales</Text>}
+        />
+      </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 12, backgroundColor: "#f5f5f5" },
-  empty: { textAlign: "center", marginTop: 30, fontSize: 16, color: "#777" },
-});

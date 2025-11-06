@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import styles from "../styles/LoginStyle";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { login } from "../api/animals";
@@ -22,8 +23,9 @@ export default function Login({ navigation }) {
     }
   };
 
-  return (
-    <View style={styles.container}>
+ return (
+  <View style={styles.container}>
+    <View style={styles.card}>
       <Text style={styles.title}>Iniciar sesión</Text>
       <Text>Usuario</Text>
       <TextInput
@@ -44,22 +46,8 @@ export default function Login({ navigation }) {
         disabled={loading}
       />
     </View>
-  );
+  </View>
+);
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, justifyContent: "center" },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 8,
-    borderRadius: 6,
-    marginBottom: 12,
-  },
-});
+
