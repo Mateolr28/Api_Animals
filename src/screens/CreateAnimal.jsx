@@ -1,4 +1,3 @@
-// src/screens/CreateAnimal.jsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, ScrollView, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -28,11 +27,9 @@ export default function CreateAnimal({ navigation }) {
   const handleChange = (key, value) => setBody({ ...body, [key]: value });
 
   const handleSubmit = async () => {
-    // Validaciones simples
     if (!body.nombre || !body.urlImagen) return Alert.alert('Error', 'Nombre y urlImagen obligatorios');
     setLoading(true);
     try {
-      // convertir numeros
       const payload = { ...body, peso: Number(body.peso), altura: Number(body.altura), edad: Number(body.edad) };
       await createAnimal(token, payload);
       setLoading(false);

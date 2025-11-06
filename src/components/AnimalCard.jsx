@@ -1,15 +1,14 @@
-// src/components/AnimalCard.jsx
-import React from 'react';
-import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
+import React from "react";
+import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 
 export default function AnimalCard({ animal, onEdit, onDelete }) {
   const handleEditPress = () => {
-    console.log('🟢 Botón editar presionado:', animal.nombre);
+    console.log("Botón editar presionado:", animal.nombre);
     if (onEdit) onEdit(animal);
   };
 
   const handleDeletePress = () => {
-    console.log('🔴 Botón eliminar presionado:', animal.nombre);
+    console.log("Botón eliminar presionado:", animal.nombre);
     if (onDelete) onDelete(animal);
   };
 
@@ -55,10 +54,10 @@ export default function AnimalCard({ animal, onEdit, onDelete }) {
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    backgroundColor: "#fff",
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
@@ -73,12 +72,12 @@ const styles = StyleSheet.create({
   info: {
     flex: 1,
     marginLeft: 10,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
-  title: { fontSize: 16, fontWeight: 'bold' },
-  subtitle: { fontSize: 14, color: '#777' },
-  details: { marginTop: 5, color: '#444' },
-  buttons: { flexDirection: 'row', marginTop: 10 },
+  title: { fontSize: 16, fontWeight: "bold" },
+  subtitle: { fontSize: 14, color: "#777" },
+  details: { marginTop: 5, color: "#444" },
+  buttons: { flexDirection: "row", marginTop: 10 },
   btn: {
     paddingVertical: 6,
     paddingHorizontal: 12,
@@ -86,14 +85,14 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   editBtn: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
   },
   deleteBtn: {
-    backgroundColor: '#F44336',
+    backgroundColor: "#F44336",
   },
   btnText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 14,
   },
 });

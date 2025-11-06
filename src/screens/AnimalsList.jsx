@@ -1,5 +1,5 @@
 // src/screens/AnimalsList.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,41 +8,37 @@ import {
   StyleSheet,
   Alert,
   RefreshControl,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getAnimals, deleteAnimal } from '../api/animals';
-import AnimalCard from '../components/AnimalCard';
+  Platform,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAnimals, deleteAnimal } from "../api/animals";
+import AnimalCard from "../components/AnimalCard";
 
 export default function AnimalsList({ navigation }) {
   const [animals, setAnimals] = useState([]);
   const [token, setToken] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Cargar token y animales
-  const loadTokenAndAnimals = async () => {
+  const loadData = async () => {
     try {
-      const t = await AsyncStorage.getItem('@token');
-      if (!t) {
-        Alert.alert('Error', 'Token no encontrado. Inicia sesión nuevamente.');
-        navigation.replace('Login');
+      const savedToken = await AsyncStorage.getItem("@token");
+      if (!savedToken) {
+        Alert.alert("Error", "Token no encontrado. Inicia sesión nuevamente.");
+        navigation.replace("Login");
         return;
       }
-      setToken(t);
-      await fetchAnimals(t);
+      setToken(savedToken);
+      await fetchAnimals(savedToken);
     } catch (err) {
-      console.error('Error al cargar token:', err);
+      console.error("Error al cargar datos:", err);
     }
   };
 
-  // Obtener lista de animales
   const fetchAnimals = async (tkn) => {
     try {
       setRefreshing(true);
       const data = await getAnimals(tkn);
 
-      console.log('📦 Respuesta GET /animals:', JSON.stringify(data, null, 2));
-
-      // Detectar el array correcto
       let list = [];
       if (Array.isArray(data)) list = data;
       else if (data.animals) list = data.animals;
@@ -52,71 +48,59 @@ export default function AnimalsList({ navigation }) {
 
       setAnimals(list);
     } catch (err) {
-      console.error('❌ Error al obtener animales:', err);
-      Alert.alert('Error', 'No se pudieron cargar los animales: ' + err.message);
+      console.error("Error al obtener animales:", err);
     } finally {
       setRefreshing(false);
     }
   };
 
-  // Confirmar eliminación
   const handleDelete = (animal) => {
     const id = animal._id || animal.id;
-    Alert.alert('Confirmar eliminación', `¿Eliminar a ${animal.nombre}?`, [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Eliminar', style: 'destructive', onPress: () => performDelete(id) },
-    ]);
+    const isWeb = Platform.OS === "web";
+
+    if (isWeb) {
+      const confirmed = window.confirm(`¿Eliminar a ${animal.nombre}?`);
+      if (confirmed) performDelete(id);
+    } else {
+      Alert.alert("Confirmar", `¿Eliminar a ${animal.nombre}?`, [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Eliminar", onPress: () => performDelete(id) },
+      ]);
+    }
   };
 
-  // Eliminar animal de la API
   const performDelete = async (id) => {
-  try {
     if (!id) {
-      Alert.alert('Error', 'ID de animal inválido.');
+      Alert.alert("Error", "ID no válido.");
       return;
     }
 
-    console.log('🗑️ Eliminando animal con ID:', id);
-    console.log('🔑 Token actual:', token);
+    try {
+      await deleteAnimal(token, id);
+      Alert.alert("Éxito", "Animal eliminado correctamente.");
+      await fetchAnimals(token);
+    } catch (err) {
+      console.error("Error al eliminar:", err);
+      Alert.alert("Error", err.message || "No se pudo eliminar el animal");
+    }
+  };
 
-    const resp = await deleteAnimal(token, id);
-    console.log('🗑️ Resultado DELETE:', resp);
-
-    Alert.alert('Éxito', 'Animal eliminado correctamente.');
-    await fetchAnimals(token); // refrescar lista
-  } catch (err) {
-    console.error('❌ Error al eliminar:', err);
-    const detail =
-      err.body?.message ||
-      (err.body && JSON.stringify(err.body)) ||
-      err.message ||
-      'Error desconocido';
-    Alert.alert('Error', detail);
-  }
-};
-
-  // Editar animal
   const handleEdit = (animal) => {
-    navigation.navigate('EditAnimal', { animal });
+    navigation.navigate("EditAnimal", { animal });
   };
 
   useEffect(() => {
-    const unsub = navigation.addListener('focus', () => {
-      loadTokenAndAnimals();
-    });
-    loadTokenAndAnimals();
-    return unsub;
+    const unsubscribe = navigation.addListener("focus", loadData);
+    loadData();
+    return unsubscribe;
   }, []);
 
   return (
     <View style={styles.container}>
-      <View style={styles.buttonContainer}>
-        <Button
-          title="➕ Crear nuevo animal"
-          onPress={() => navigation.navigate('CreateAnimal')}
-        />
-      </View>
-
+      <Button
+        title="Crear nuevo animal"
+        onPress={() => navigation.navigate("CreateAnimal")}
+      />
       <FlatList
         data={animals}
         keyExtractor={(item) => item._id || item.id || item.nombre}
@@ -128,18 +112,18 @@ export default function AnimalsList({ navigation }) {
           />
         )}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={() => fetchAnimals(token)} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => fetchAnimals(token)}
+          />
         }
-        ListEmptyComponent={() => (
-          <Text style={styles.empty}>No hay animales registrados</Text>
-        )}
+        ListEmptyComponent={<Text style={styles.empty}>No hay animales</Text>}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 12, backgroundColor: '#f5f5f5' },
-  buttonContainer: { marginBottom: 10 },
-  empty: { textAlign: 'center', marginTop: 30, fontSize: 16, color: '#777' },
+  container: { flex: 1, padding: 12, backgroundColor: "#f5f5f5" },
+  empty: { textAlign: "center", marginTop: 30, fontSize: 16, color: "#777" },
 });
